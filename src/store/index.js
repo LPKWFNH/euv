@@ -7,7 +7,9 @@ import module from "./modules/module";
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state: {},
+  state: {
+
+  },
   getters,
   mutations,
   actions,
