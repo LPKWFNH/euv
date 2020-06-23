@@ -9,22 +9,9 @@ import $xhr from './common/network/axios/xhr';
 Vue.prototype.xhr = $xhr;
 
 $xhr.xhr({
-  url: '/xhr/get',
-  method: 'xGET',
-  params: {
-      a: 'A',
-      b: 'B'
-  }
-}).then(
-    res => {
-      console.log(res);
-    }
-).catch(
-    err => {
-      console.log(err);
-    }
-);
-
+    url: '/xhr/post',
+    method: 'POST',
+});
 
 new Vue({
   router,
