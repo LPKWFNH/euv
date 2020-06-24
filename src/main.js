@@ -15,9 +15,6 @@ $xhr.xhr({
         a: "A",
         b: "B",
         c: "C"
-    },
-    failure(err) {
-        console.log("failure");
     }
 });
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import uuid from 'uuid';
 export default {
     xhr(config) {
         config = this.buildConfig(config);
@@ -45,6 +46,16 @@ export default {
         if (method === "GET" && config.data) {
             config.param = config.data;
             delete config.data;
+        }
+        if (method=== "POST" && config.data) {
+            let content = config.data;
+            config.data = {
+                header: {
+                    time: new Date(),
+                    uuid: uuid.v4(),
+                },
+                content
+            }
         }
         if (!config.success) {config.success = res => {};}
         if (!config.failure) {config.failure = err => this.defaultFailure(err);}
