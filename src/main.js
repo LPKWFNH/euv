@@ -11,6 +11,14 @@ Vue.prototype.xhr = $xhr;
 $xhr.xhr({
     url: '/xhr/post',
     method: 'POST',
+    data: {
+        a: "A",
+        b: "B",
+        c: "C"
+    },
+    failure(err) {
+        console.log("failure");
+    }
 });
 
 new Vue({

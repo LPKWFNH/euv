@@ -8,77 +8,59 @@ export default {
         });
         $axios.interceptors.request.use(
             config => {
-                console.log(config);
+                config.headers.Authorization = "Authorization";
+                return config;
             },
             err => {
-                console.log(err);
                 return Promise.reject(err);
             }
         )
         $axios.interceptors.response.use(
             res => {
-                console.log(res);
                 return res;
             },
             err => {
-                console.log(err);
                 return Promise.reject(err);
             }
         );
-        return $axios.request(config).then(res => {config.success(res)}).catch(err => {config.failure(err)});
+        return $axios.request(config)
+            .then(res => {config.success(res)})
+            .catch(err => {config.failure(err)});
     },
     getMethod(method) {
         let $method = method.replace(/\s*/g,"").toLocaleUpperCase();
         let methodType = ["GET", "DELETE", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "LINK", "UNLINK"];
-        if (!method) {
-            console.error("METHOD CAN'T NOT BE EMPTY");
-            return false;
-        }
         if (!methodType.includes($method)) {
-            console.error("METHOD:[GET|DELETE|HEAD|OPTIONS|POST|PUT|PATCH|LINK|UNLINK]");
+            console.error("METHOD NOT MATCH [GET|DELETE|HEAD|OPTIONS|POST|PUT|PATCH|LINK|UNLINK]");
             return false;
         }
         return $method;
     },
-    buildGetConfig(config) {
-        if (config.data) {
-            config.params = config.data;
-            config.data = null;
-        } else {
-            config.params = {};
-        }
-        config.params.token = "token";
-        return config;
-    },
-    buildPostConfig(config) {
-        if (!config.headers) {
-            config.headers = {}
-        }
-        config.headers.Authorization = "Authorization";
-        return config;
-    },
     buildConfig(config) {
-        if (!config) {
-            console.log("XHR CONFIG CAN'T NOT BE EMPTY");
-            return false;
+        if (!config) {console.error("XHR CONFIG CAN'T NOT BE NULL");return false;}
+        if (!config.url) {console.error("URL CAN'T NOT BE NULL");return false;}
+        if (!config.method) {console.error("URL CAN'T NOT BE NULL");return false;}
+        let method = this.getMethod(config.method);
+        if (!method) return false;
+        if (method === "GET" && config.data) {
+            config.param = config.data;
+            delete config.data;
         }
-        let $method = this.getMethod(config.method);
-        if (!$method) return false;
-        config.method = $method;
-        switch (config.method) {
-            case "GET": config = this.buildGetConfig(config);break;
-            case "POST": config = this.buildPostConfig(config);break;
-        }
-        if (!config.success) {
-            config.success = res => {
-                console.log(res);
-            };
-        }
-        if (!config.failure) {
-            config.failure = err => {
-                console.log(err);
-            };
-        }
+        if (!config.success) {config.success = res => {};}
+        if (!config.failure) {config.failure = err => this.defaultFailure(err);}
         return config;
+    },
+    defaultFailure(err) {
+        let errDesc = {code: null, desc: null}
+        if (!err.response) {console.error("SERVICE EXCEPTION")}
+        if (err.response.status && err.response.status !== 200) {
+            errDesc.code = err.response.status;
+            errDesc.desc = 'HTTP ERROR!STATUS CODE:' + errDesc.code;
+        }
+        if (err.response.data) {
+            errDesc.code = err.response.data;
+            errDesc.desc = err.response.data;
+        }
+        console.error(errDesc.desc);
     }
 }
